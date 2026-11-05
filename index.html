@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>三角洲行动 S12「微光」3×3 保险箱任务思维导图（含阶段星级门槛）</title>
+<style>
+  :root{
+    --bg:#070b14; --bg2:#0b111d; --card:#101827; --card2:#0d1523;
+    --line:rgba(255,255,255,.09); --txt:#e6ecf5; --txt2:#95a3b8; --txt3:#66748a;
+    --s1:#4fc3f7; --s2:#ffb74d; --s3:#b388ff; --s4:#ff6b6b;
+    --gold:#ffd166; --blue:#7fb2ff;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:
+      radial-gradient(1200px 600px at 15% -10%,rgba(79,195,247,.10),transparent 60%),
+      radial-gradient(900px 500px at 95% 0%,rgba(255,107,107,.08),transparent 55%),
+      var(--bg);
+    color:var(--txt);
+    font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;overflow:hidden;
+  }
+  #app{display:flex;flex-direction:column;height:100vh}
+
+  /* ---------- header ---------- */
+  header{
+    flex:0 0 auto;padding:14px 22px 12px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+    background:linear-gradient(180deg,rgba(16,24,39,.92),rgba(9,14,24,.6));
+    backdrop-filter:blur(8px);z-index:20;
+  }
+  .brand{display:flex;flex-direction:column;gap:3px;min-width:300px}
+  .brand .k{font-size:11px;letter-spacing:2.4px;color:var(--txt3);text-transform:uppercase}
+  .brand h1{margin:0;font-size:20px;letter-spacing:.5px;font-weight:800}
+  .brand h1 em{font-style:normal;color:var(--s1)}
+  .brand .s{font-size:12px;color:var(--txt2)}
+  .stats{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{
+    display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;
+    border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:12px;color:var(--txt2);
+  }
+  .pill b{color:var(--txt);font-size:13px}
+  .pill.gold{border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.07)}
+  .pill.gold b{color:var(--gold)}
+  .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .tabs{display:flex;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:3px}
+  .tabs button{
+    border:0;background:transparent;color:var(--txt2);font-size:13px;padding:7px 16px;border-radius:8px;
+    cursor:pointer;font-family:inherit;transition:.18s;
+  }
+  .tabs button.on{background:linear-gradient(180deg,rgba(79,195,247,.25),rgba(79,195,247,.12));color:#dff2ff;box-shadow:inset 0 0 0 1px rgba(79,195,247,.35)}
+  .search{position:relative}
+  .search input{
+    width:230px;padding:9px 12px 9px 32px;border-radius:10px;border:1px solid var(--line);
+    background:rgba(255,255,255,.04);color:var(--txt);font-size:13px;font-family:inherit;outline:none;transition:.2s;
+  }
+  .search input:focus{border-color:rgba(79,195,247,.5);box-shadow:0 0 0 3px rgba(79,195,247,.12)}
+  .search::before{content:"⌕";position:absolute;left:11px;top:50%;transform:translateY(-52%);color:var(--txt3);font-size:15px}
+  .search .hits{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--txt3)}
+
+  /* ---------- main ---------- */
+  #main{flex:1;display:flex;min-height:0;position:relative}
+  #stage{
+    flex:1;position:relative;overflow:hidden;min-width:0;
+    background-image:radial-gradient(rgba(255,255,255,.055) 1px,transparent 1px);
+    background-size:26px 26px;cursor:grab;
+  }
+  #stage.dragging{cursor:grabbing}
+  #canvas{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+  #links{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+  #nodes{position:absolute;left:0;top:0}
+
+  .node{
+    position:absolute;display:flex;align-items:center;gap:8px;
+    border-radius:10px;border:1px solid var(--line);background:var(--card2);
+    padding:0 12px;cursor:pointer;user-select:none;transition:box-shadow .18s,border-color .18s,opacity .2s;
+    overflow:hidden;
+  }
+  .node:hover{border-color:rgba(255,255,255,.28);box-shadow:0 6px 24px rgba(0,0,0,.45)}
+  .node.dim{opacity:.18}
+  .node.hit{box-shadow:0 0 0 2px rgba(255,209,102,.75),0 0 24px rgba(255,209,102,.4);border-color:transparent}
+
+  .node-root{
+    flex-direction:column;justify-content:center;align-items:flex-start;gap:2px;
+    background:linear-gradient(135deg,rgba(79,195,247,.18),rgba(179,136,255,.16),rgba(255,107,107,.14));
+    border-color:rgba(120,190,255,.45);box-shadow:0 0 40px rgba(79,195,247,.22),inset 0 1px 0 rgba(255,255,255,.12);
+  }
+  .node-root .rcode{font-size:10.5px;letter-spacing:1.6px;color:#9fd8ff}
+  .node-root .rname{font-size:22px;font-weight:800;letter-spacing:.5px}
+  .node-root .rsub{font-size:11px;color:var(--txt2)}
+
+  .node-stage{flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;background:linear-gradient(120deg,color-mix(in srgb,var(--c) 16%,#0d1523),#0d1523 70%)}
+  .node-stage::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c)}
+  .node-stage .scode{font-size:10px;letter-spacing:1.4px;color:var(--c);opacity:.95}
+  .node-stage .sname{font-size:17px;font-weight:800}
+  .node-stage .scnt{font-size:10.5px;color:var(--txt3);white-space:nowrap}
+
+  .node-chain{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.11)}
+  .node-chain .cname{font-size:12.5px;font-weight:700;white-space:nowrap;letter-spacing:0}
+  .node-chain .cnt{font-size:10.5px;color:var(--txt3);background:rgba(255,255,255,.07);padding:1px 6px;border-radius:999px;margin-left:2px}
+  .node-chain .stars{font-size:10.5px;font-weight:700;color:var(--gold);background:rgba(255,209,102,.13);border:1px solid rgba(255,209,102,.32);padding:0 6px;border-radius:999px;margin-left:auto;flex:0 0 auto}
+  .node-chain .mtag{font-size:10px;color:#8fb7d8;background:rgba(127,178,255,.12);border:1px solid rgba(127,178,255,.3);padding:0 6px;border-radius:999px;margin-left:auto;flex:0 0 auto}
+  .node-chain .plus{font-size:11px;color:var(--txt3);margin-left:4px}
+  .node-stage .sneed{font-size:10px;color:var(--gold);opacity:.94;white-space:nowrap;letter-spacing:0}
+
+  .node-task{background:rgba(255,255,255,.028);border-color:rgba(255,255,255,.075);padding:0 10px}
+  .node-task .tid{font-family:Consolas,Menlo,monospace;font-size:11px;color:var(--c);opacity:.85;letter-spacing:.3px;flex:0 0 auto}
+  .node-task .tname{font-size:13px;color:#dbe4f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
+  .node-task .warn{width:14px;height:14px;border-radius:50%;background:rgba(255,107,107,.18);color:#ff8f8f;font-size:9px;
+    display:flex;align-items:center;justify-content:center;margin-left:auto;flex:0 0 auto}
+  .node-task.sel{border-color:rgba(79,195,247,.75);box-shadow:0 0 0 1px rgba(79,195,247,.5),0 0 22px rgba(79,195,247,.28)}
+
+  /* toolbar */
+  #toolbar{
+    position:absolute;left:16px;top:14px;z-index:15;display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+    padding:6px;border-radius:12px;border:1px solid var(--line);
+    background:rgba(11,17,29,.82);backdrop-filter:blur(10px);box-shadow:0 8px 30px rgba(0,0,0,.4);
+  }
+  #toolbar button{
+    border:1px solid transparent;background:rgba(255,255,255,.04);color:var(--txt2);font-size:12px;
+    padding:6px 11px;border-radius:8px;cursor:pointer;font-family:inherit;transition:.16s;white-space:nowrap;
+  }
+  #toolbar button:hover{background:rgba(255,255,255,.09);color:var(--txt)}
+  #toolbar button.on{background:rgba(79,195,247,.16);color:#cfeeff;border-color:rgba(79,195,247,.4)}
+  #toolbar .sep{width:1px;height:18px;background:var(--line);margin:0 2px}
+  #hint{
+    position:absolute;left:16px;bottom:14px;z-index:15;font-size:11.5px;color:var(--txt3);
+    background:rgba(11,17,29,.72);border:1px solid var(--line);border-radius:9px;padding:7px 12px;
+  }
+  #hint b{color:var(--txt2);font-weight:600}
+  #zoombar{position:absolute;right:16px;bottom:14px;z-index:15;display:flex;gap:6px;align-items:center;
+    background:rgba(11,17,29,.82);border:1px solid var(--line);border-radius:10px;padding:5px 8px;font-size:11.5px;color:var(--txt2)}
+  #zoombar button{width:24px;height:24px;border-radius:6px;border:1px solid var(--line);background:rgba(255,255,255,.05);
+    color:var(--txt);cursor:pointer;font-size:13px;line-height:1}
+
+  /* ---------- panel ---------- */
+  #panel{
+    position:absolute;right:0;top:0;bottom:0;width:372px;z-index:30;
+    border-left:1px solid var(--line);background:linear-gradient(180deg,rgba(13,20,33,.985),rgba(8,12,21,.99));
+    overflow-y:auto;padding:20px 18px 40px;
+    transform:translateX(103%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+    box-shadow:-24px 0 60px rgba(0,0,0,.55);backdrop-filter:blur(10px);
+  }
+  #panel.open{transform:none}
+  #pclose{
+    position:absolute;right:384px;top:16px;z-index:31;width:30px;height:30px;border-radius:9px;
+    border:1px solid var(--line);background:rgba(11,17,29,.9);color:var(--txt2);cursor:pointer;
+    font-size:13px;line-height:1;display:none;align-items:center;justify-content:center;
+  }
+  #pclose.on{display:flex}
+  #panel::-webkit-scrollbar,.list-body::-webkit-scrollbar{width:8px}
+  #panel::-webkit-scrollbar-thumb,.list-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:8px}
+  .p-title{font-size:11px;letter-spacing:2px;color:var(--txt3);margin:0 0 10px}
+  .p-card{border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025);padding:14px;margin-bottom:14px}
+  .crumb{font-size:11px;color:var(--txt3);margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .crumb i{font-style:normal;color:var(--c,var(--s1))}
+  .tname-big{font-size:19px;font-weight:800;line-height:1.3;margin-bottom:4px}
+  .tid-big{font-family:Consolas,monospace;font-size:11.5px;color:var(--txt3);letter-spacing:.6px}
+  .badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .badge{font-size:10.5px;padding:3px 8px;border-radius:6px;background:rgba(255,107,107,.12);color:#ff9c9c;border:1px solid rgba(255,107,107,.28)}
+  .sec{font-size:11px;letter-spacing:1.6px;color:var(--txt3);margin:18px 0 8px;display:flex;align-items:center;gap:8px}
+  .sec::after{content:"";flex:1;height:1px;background:var(--line)}
+  .obj{margin:0;padding:0;list-style:none}
+  .obj li{position:relative;padding-left:16px;font-size:12.5px;line-height:1.75;color:#c8d3e2;margin-bottom:5px}
+  .obj li::before{content:"";position:absolute;left:3px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--c,var(--s1));opacity:.8}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:11.5px;padding:4px 9px;border-radius:7px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#c3cede}
+  .chip.hb{color:var(--gold);border-color:rgba(255,209,102,.3);background:rgba(255,209,102,.09)}
+  .chip.exp{color:var(--blue);border-color:rgba(127,178,255,.28);background:rgba(127,178,255,.09)}
+  .chip.card{color:#ff8f8f;border-color:rgba(255,107,107,.34);background:rgba(255,107,107,.12);font-weight:700}
+  .kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .kpi div{border:1px solid var(--line);border-radius:9px;padding:9px 10px;background:rgba(255,255,255,.025)}
+  .kpi span{display:block;font-size:10.5px;color:var(--txt3);margin-bottom:3px}
+  .kpi b{font-size:14px}
+  .note{font-size:11.5px;line-height:1.7;color:var(--txt3)}
+  .note b{color:var(--txt2)}
+  .stagebar{display:flex;height:6px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.06);margin-top:10px}
+  .stagebar i{display:block;height:100%}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--txt3);margin-top:8px}
+  .legend s{text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+  .legend u{width:8px;height:8px;border-radius:2px;display:inline-block}
+
+  /* ---------- list view ---------- */
+  #listView{display:none;flex:1;min-height:0;overflow:hidden;flex-direction:column}
+  #listView.on{display:flex}
+  .list-toolbar{
+    flex:0 0 auto;display:flex;gap:8px;align-items:center;padding:12px 22px;border-bottom:1px solid var(--line);flex-wrap:wrap;
+  }
+  .list-toolbar .cbtn{
+    border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--txt2);font-size:12px;
+    padding:6px 13px;border-radius:999px;cursor:pointer;font-family:inherit;
+  }
+  .list-toolbar .cbtn.on{color:#08111f;font-weight:700;background:var(--c,#4fc3f7);border-color:transparent}
+  .list-body{flex:1;overflow-y:auto;padding:18px 24px 60px}
+  .list-body>*{max-width:1180px;margin:0 auto}
+  .lstage{margin-bottom:26px}
+  .lstage h2{font-size:17px;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .lstage h2 i{width:4px;height:18px;border-radius:2px;background:var(--c);display:inline-block}
+  .lstage .lsub{font-size:11.5px;color:var(--txt3);margin:0 0 14px 13px}
+  .lchain{margin-bottom:16px}
+  .lchain h3{font-size:13px;margin:0 0 8px;color:var(--txt2);font-weight:700;letter-spacing:.4px}
+  .lchain h3 span{color:var(--txt3);font-weight:400;margin-left:6px;font-size:11px}
+  .ltask{
+    border:1px solid var(--line);border-left:3px solid var(--c);border-radius:9px;padding:11px 13px;
+    background:rgba(255,255,255,.024);margin-bottom:8px;
+  }
+  .ltask .h{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:6px}
+  .ltask .h .id{font-family:Consolas,monospace;font-size:11px;color:var(--c)}
+  .ltask .h .nm{font-size:13.5px;font-weight:700}
+  .ltask .h .b{font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(255,107,107,.12);color:#ff9c9c;border:1px solid rgba(255,107,107,.25)}
+  .ltask .o{font-size:12px;color:#b9c5d6;line-height:1.7;padding-left:12px;position:relative}
+  .ltask .o::before{content:"·";position:absolute;left:2px;color:var(--c)}
+  .ltask .r{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  @media (max-width:1080px){
+    #panel{display:none}
+    .brand{min-width:auto}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">
+      <div class="k">DELTA FORCE · SEASON 12 「微光」</div>
+      <h1>3×3 保险箱任务 <em>思维导图</em></h1>
+      <div class="s">行动计划 4 阶段 · 主线 / 支线全收录 · 任务编号 + 目标 + 奖励 · 阶段星级门槛</div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="right">
+      <div class="search"><input id="q" placeholder="搜索任务名 / 编号 / 目标"><span class="hits" id="hits"></span></div>
+      <div class="tabs">
+        <button id="tabMap" class="on">思维导图</button>
+        <button id="tabList">任务总览</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="main">
+    <div id="stage">
+      <div id="canvas">
+        <svg id="links"></svg>
+        <div id="nodes"></div>
+      </div>
+      <div id="toolbar">
+        <button id="btnOverview" class="on">结构总览</button>
+        <div class="sep"></div>
+        <button data-stage="0">阶段 1</button>
+        <button data-stage="1">阶段 2</button>
+        <button data-stage="2">阶段 3</button>
+        <button data-stage="3">阶段 4</button>
+        <div class="sep"></div>
+        <button id="btnExpand">展开全部</button>
+        <div class="sep"></div>
+        <button id="btnInfo">奖励总览</button>
+      </div>
+      <div id="hint"><b>点击分支</b>展开任务 · <b>点击任务</b>看详情 · <b>拖拽</b>平移 · <b>滚轮</b>缩放</div>
+      <div id="zoombar"><button id="zo">−</button><span id="zval">62%</span><button id="zi">＋</button><button id="zf">适应</button></div>
+    </div>
+    <aside id="panel"></aside>
+    <button id="pclose" title="收起面板">✕</button>
+  </div>
+
+  <div id="listView">
+    <div class="list-toolbar" id="listFilter"></div>
+    <div class="list-body" id="listBody"></div>
+  </div>
+</div>
+
+<script>
+/* ============ 数据：来自 23 张任务截图逐条录入 ============ */
+const S = (code, name, color, chains) => ({code, name, color, chains});
+const C = (name, tasks) => ({name, tasks});
+const t = (id, name, obj, rw, tags) => ({id, name, obj, rw, tags: tags || []});
+
+const DATA = [
+  S('第 1 阶段', '萤火初现', '#4fc3f7', [
+    C('赛季主线', [
+      t('82001', '恢复出勤', ['任意机密/绝密行动，成功撤离 1 次（单局收益需 ≥ 300,000 哈夫币）'], ['经验1,250', '哈夫币200,000', '顶级安全箱1天权限卡×1']),
+      t('82002', '初显锋芒', ['任意机密/绝密行动，使用任意突击步枪/轻机枪/冲锋枪，击败 5 名任意敌方士兵'], ['经验1,500', '哈夫币200,000', '战地医疗箱×2']),
+      t('82003', '物资整备', ['任意机密/绝密行动，累计成功带出 3 件品质 ≥ 紫色的能源燃料/资料情报/电子物品类收集品'], ['经验1,500', '哈夫币200,000', '赛季任务仿制钥匙补给包×2']),
+      t('82004', '前线侦察', ['上交 2 件品质 ≥ 紫色的电子物品类收集品', '上交 2 件品质 ≥ 紫色的资料情报类收集品'], ['经验1,500', '哈夫币200,000', '赛季任务定制装备券×1']),
+      t('82005', '失控脑机', ['零号大坝机密/永夜：大坝坝顶小屋内指定地点，获取任务物品', '大坝坝顶指挥所内指定地点，超感回溯作战终端处遗留语音线索'], ['经验1,550', '哈夫币200,000', '体能强化剂×5', '顶级安全箱1天权限卡×1']),
+      t('82006', '黑心博士', ['AZ3 机密/超能：老科学院控制中心内指定地点，获取任务物品【患者医疗记录】', '同处超感回溯作战终端处遗留的语音线索', '携带任务物品成功撤离'], ['经验1,800', '哈夫币200,000', 'E型滤毒罐×2'], ['单局完成', '失败重置']),
+      t('82007', '药师亚尼', ['巴克什：老城区樱桃小镇民房内指定地点，获取任务物品【药物采购单】', '同处超感回溯收音机处遗留的语音线索', '巴克什集市餐厅内指定地点，超感回溯阿萨尔的曲谱'], ['经验1,600', '哈夫币250,000', '赛季任务定制装备券×1'])
+    ]),
+    C('1-1 配给运用作战', [
+      t('82901', '深度定制-1', ['任意机密/绝密行动，使用任意轻机枪，击败 5 名敌方士兵'], ['经验1,500', '哈夫币125,000', '高级燃料×2']),
+      t('82902', '深度定制-2', ['任意机密/绝密行动，使用任意冲锋枪，击败 5 名特殊兵种（盾兵 / 狙击兵 / 火箭兵 / 机枪兵 / 喷火兵 / 哈夫克重装净化者 / 首领卫士）'], ['经验1,500', '哈夫币175,000']),
+      t('82903', '深度定制-3', ['任意机密/绝密行动，装备任意 3 级及以上阿萨拉风格护甲时，累计击败 2 名敌方特战干员'], ['经验1,750', '哈夫币225,000']),
+      t('82904', '深度定制-4', ['任意机密/绝密行动，装备任意 3 级及以下护甲时，使用任意突击步枪/射手步枪，累计击败 2 名敌方特战干员'], ['经验1,750', '哈夫币225,000']),
+      t('82905', '深度定制-5', ['任意机密/绝密行动，累计击败 3 名敌方特战干员'], ['经验1,750', '哈夫币250,000', '哈夫克机密档案×1', '顶级安全箱1天权限卡×1'], ['限制：入局装备价值 ≥ 400,000'])
+    ]),
+    C('1-2 再难告别', [
+      t('82906', '再难告别-1', ['水泥厂入口处岗亭内，获取任务物品', '水泥厂宿舍一楼房间内，超感回溯信笺处遗留的语音线索'], ['经验1,750', '哈夫币150,000', '体能强化剂×5', '5.56×45mm CINDER×200']),
+      t('82907', '再难告别-2', ['行政楼西楼入口处岗亭内，获取任务物品', '行政楼西楼旁建筑工地房屋内，超感回溯信笺处遗留的语音线索'], ['经验1,750', '哈夫币200,000']),
+      t('82908', '再难告别-3', ['野外阿萨拉营地内指定地点，超感回溯信笺处遗留的语音线索', '使用干员完成 2 次对局（无论成功或失败）'], ['经验1,750', '哈夫币175,000']),
+      t('82909', '再难告别-4', ['大坝野外集装箱房内，超感回溯信笺处遗留的语音线索', '大变电站指定房间内，放置 1 件品质 > 蓝色的医疗道具类收集品', '副变电站宿舍指定房间内，放置 1 件品质 > 蓝色的家居物品类收集品'], ['经验1,750', '哈夫币200,000']),
+      t('82910', '再难告别-5', ['游客中心中央喷泉处，超感回溯信笺处遗留的语音线索', '游客中心前台，获取任务物品', '携带任务物品，成功撤离'], ['经验2,000', '哈夫币350,000', '哈夫克机密档案×1', '顶级安全箱1天权限卡×1'])
+    ]),
+    C('1-3 逃脱艺术：基础', [
+      t('82911', '战略转进-1', ['长弓溪谷 / AZ3 / 零号大坝 的机密·永夜·超能行动中，成功撤离 1 次'], ['经验1,750', '哈夫币125,000', '战地医疗箱×2', '5.45×39mm SPALL×200']),
+      t('82912', '战略转进-2', ['AZ3 / 零号大坝 的机密·永夜·超能行动中，从任意付费撤离点成功撤离 1 次'], ['经验1,750', '哈夫币150,000']),
+      t('82913', '战略转进-3', ['任意机密/绝密行动中，成功撤离累计带出收益达到 650,000 哈夫币'], ['经验1,750', '哈夫币100,000']),
+      t('82914', '战略转进-4', ['巴克什 / 航天基地 / AZ3 的机密·绝密·超能行动中，成功撤离 1 次（单局收益 ≥ 550,000）'], ['经验2,000', '哈夫币200,000']),
+      t('82915', '战略转进-5', ['任意机密/绝密行动，成功撤离 1 次（单局收益 ≥ 750,000）', '成功带出 3 件任意品质、局内收集的防具或头盔'], ['经验2,000', '哈夫币300,000', '顶级安全箱1天权限卡×1'])
+    ]),
+    C('1-4 保障有力', [
+      t('82916', '保障有力：配件', ['在特勤处成功生产 1 次 M157 火控光学系统'], ['经验2,000', '哈夫币125,000', '移动电缆×1', '.300 BLK TTV×80']),
+      t('82917', '保障有力：防护', ['在特勤处成功生产 1 次 GN 重型头盔', '生产 1 次精密头盔维修包'], ['经验1,750', '哈夫币150,000']),
+      t('82918', '保障有力：医疗', ['在特勤处成功生产 1 次感知强化剂', '生产 1 次黑鹰野战胸挂'], ['经验1,750', '哈夫币100,000']),
+      t('82919', '保障有力：火力', ['在特勤处成功生产 1 次 5.45×39mm BS'], ['经验1,750', '哈夫币200,000']),
+      t('82920', '保障有力：磐石', ['在特勤处成功生产 1 次高级护甲维修组合'], ['经验2,000', '哈夫币300,000', '顶级安全箱1天权限卡×1'])
+    ])
+  ]),
+
+  S('第 2 阶段', '风之火焰', '#ffb74d', [
+    C('赛季主线', [
+      t('82008', '求医问诊', ['零号大坝：水泥厂地下通道房间内指定地点，获取任务物品', '建筑工地民房内指定地点，超感回溯收音机处遗留的语音线索'], ['经验1,850', '哈夫币225,000', 'AN94紫色步枪精准枪管×1']),
+      t('82009', '静息之花', ['AZ3：收集 3 件品质 ≥ 紫色的医疗物品 / 资料情报类收集品', '海水处理区地下通道内指定地点，超感回溯病历本处遗留的语音线索'], ['经验1,850', '哈夫币225,000', 'AN94紫色步枪稳定枪管×1']),
+      t('82010', '拾取希望', ['巴克什：老城区蓝调山城房屋内，获取任务物品', '同处超感回溯收音机处遗留的语音线索', '蓝调山城边岸指定地点，超感回溯阿萨尔的曲谱'], ['经验1,850', '哈夫币225,000', 'P90通用枪机机匣组件×1']),
+      t('82011', '封城', ['AZ3：海水处理区外围码头处，超感回溯录音带处遗留的语音线索', '同处指定地点，获取任务物品'], ['经验1,900', '哈夫币350,000', '可编程处理器×2']),
+      t('82012', '夺命父子', ['零号大坝：北集装箱区外区域，超感回溯军情录音处遗留的语音线索', '同区域指定地点，获取任务物品', '携带任务物品，成功撤离'], ['经验1,900', '哈夫币250,000', '单兵防弹护甲×1'], ['单局完成']),
+      t('82013', '钟表匠克劳斯', ['AZ3：应急火电站内指定地点，获取任务物品', '后处理厂区域内指定地点，超感回溯录音带处遗留的语音线索', '累计完成 2 次任意局内行动'], ['经验1,900', '哈夫币250,000', 'GTS防弹头盔×1'], ['单局完成']),
+      t('82014', '沙尘暴', ['巴克什：老城区民房天台指定地点，超感回溯作战电台处遗留的语音线索', '同处指定地点，获取任务物品', '累计完成 2 次任意局内行动'], ['经验2,150', '哈夫币250,000', 'M250通用机枪专属枪管×1']),
+      t('82015', '潜伏', ['任意机密/绝密行动，成功撤离 1 次（单局收益 ≥ 750,000 哈夫币）', '累计成功带出 3 件品质 ≥ 金色的资料情报 / 电子物品类收集品'], ['经验2,150', '哈夫币300,000'], ['单局完成', '奖励图截断'])
+    ]),
+    C('2-1 披坚执锐', [
+      t('82921', '统治力', ['任意机密/绝密行动，装备防护等级 ≥ 5 的护甲与头盔时，累计击败 3 名敌方特战干员'], ['经验1,850', '哈夫币125,000', '高级燃料×4', '5.56×45mm CINDER×150']),
+      t('82922', '锋线前卫', ['任意机密/绝密行动，使用任意操控速度 ≥ 65 的突击步枪/轻机枪，累计击败 3 名敌方特战干员'], ['经验1,850', '哈夫币300,000']),
+      t('82923', '抵近射击', ['任意机密/绝密行动，使用配有任意爆闪手电的冲锋枪/霰弹枪，累计击败 3 名敌方特战干员'], ['经验1,850', '哈夫币125,000']),
+      t('82924', '咬紧牙关', ['任意机密/绝密行动，击败 2 名敌方特战干员'], ['经验2,100', '哈夫币225,000'], ['限制：不得使用止痛药']),
+      t('82925', '观光客', ['巴克什或航天基地的机密/绝密行动，成功撤离 1 次', '零号大坝或 AZ3 的机密·永夜·超能行动，成功撤离 1 次'], ['经验2,100', '哈夫币300,000', '高级子弹生产零件×2', '赛季任务定制装备券×1'], ['限制：≥4级护甲头盔，禁带武器/胸挂/背包'])
+    ]),
+    C('2-2 寻味阿萨拉', [
+      t('82926', '寻味阿萨拉-1', ['零号大坝：游客中心接待室内，超感回溯收音机处遗留的语音线索', '游客中心内指定地点，超感回溯收音机处遗留的语音线索', '行政楼东侧仓库后方大垃圾箱旁，获取任务物品'], ['经验1,850', '哈夫币150,000', '高级燃料×4', '5.45×39mm SPALL×150']),
+      t('82927', '寻味阿萨拉-2', ['巴克什：蓝汀旅馆二楼，获取任务物品', '蓝汀旅馆内指定地点，超感回溯收音机处遗留的语音线索', '大浴场一楼指定地点，获取任务物品'], ['经验1,850', '哈夫币150,000']),
+      t('82928', '寻味阿萨拉-3', ['AZ3：运输仓库旁河岸边石墩处，获取任务物品', '运输仓库附近指定地点，超感回溯收音机处遗留的语音线索', '河岸边运输仓库后方货架上，获取任务物品'], ['经验1,850', '哈夫币200,000']),
+      t('82929', '寻味阿萨拉-4', ['零号大坝：阿萨拉军营内卡车旁指定位置，超感回溯收音机处遗留的语音线索', '管道区域道路的尽头处，获取任务物品', '携带任务物品，成功撤离'], ['经验2,100', '哈夫币250,000']),
+      t('82930', '寻味阿萨拉-5', ['AZ3：仿星器研究所内指定地点，超感回溯阿萨尔的曲谱处遗留的语音线索', '老科学院二楼会客处，超感回溯收音机处遗留的语音线索', '老科学院二楼会客处，获取任务物品', '携带任务物品，成功撤离'], ['经验2,100', '哈夫币250,000', '高级子弹生产零件×2', '顶级安全箱1天权限卡×1'])
+    ]),
+    C('2-3 常胜冠军', [
+      t('82931', '常胜冠军-1', ['阿萨拉军营二楼指定地点，超感回溯收音机处遗留的语音线索', '阿萨拉军营通往行政楼的管道入口墙上，获取任务物品'], ['经验1,850', '哈夫币125,000', '高级燃料×4']),
+      t('82932', '常胜冠军-2', ['管道区域内指定地点，获取任务物品', '管道区域内另一指定地点，获取任务物品', '军营旁建筑工地小房间，超感回溯卫星电话处遗留的语音线索'], ['经验1,850', '哈夫币200,000']),
+      t('82933', '常胜冠军-3', ['水泥厂旁桥下指定地点，超感回溯卫星电话处遗留的语音线索', '累计成功带出 3 件品质 ≥ 蓝色的资料情报 / 医疗物品类收集品'], ['经验1,850', '哈夫币200,000']),
+      t('82934', '常胜冠军-4', ['巴克什：大浴场一楼会客处，超感回溯收音机处遗留的语音线索', '老城区范围内，累计击败 5 名任意敌方士兵（队内进度共享）'], ['经验2,100', '哈夫币250,000']),
+      t('82935', '常胜冠军-5', ['巴克什：阿萨拉营地内脚手架上方，超感回溯摄像机处遗留的语音线索', '使用干员，累计完成任意 2 次局内行动', '阿萨拉营地内指定地点，获取任务物品', '携带任务物品，成功撤离'], ['经验2,100', '哈夫币100,000', '高级子弹生产零件×2', '顶级安全箱1天权限卡×1'])
+    ]),
+    C('2-4 搜索与歼灭', [
+      t('82936', '搜索与歼灭-1', ['上交 1 个核电池', '上交 1 个袖珍录像带'], ['经验1,850', '哈夫币125,000', '高级燃料×4']),
+      t('82937', '搜索与歼灭-2', ['使用任意突击/侦察类特战干员，使用任意配备 6.8×51 / 7.62×39 弹药的武器，累计击败 2 名敌方特战干员'], ['经验2,100', '哈夫币200,000']),
+      t('82938', '搜索与歼灭-3', ['使用任意突击/侦察类特战干员，使用配有任意全息瞄准镜的突击步枪/射手步枪，累计击败 2 名敌方特战干员'], ['经验1,850', '哈夫币200,000']),
+      t('82939', '搜索与歼灭-4', ['使用威龙/疾风时，累计击败 2 名敌方特战干员', '使用骇爪/银翼时，成功撤离并累计取得收益达到 1,000,000 哈夫币'], ['经验2,100', '哈夫币250,000', '.300 BLK TTV×60']),
+      t('82940', '搜索与歼灭-5', ['使用任意突击/侦察类特战干员时，完成 3 次局内行动', '使用任意突击/侦察类特战干员时，成功撤离 1 次'], ['经验1,850', '哈夫币100,000', '高级子弹生产零件×2', '顶级安全箱1天权限卡×1'])
+    ]),
+    C('2-5 控制与保障', [
+      t('82941', '控制与保障-1', ['上交 1 个外接数据卡', '上交 1 个起舞的女郎挂饰'], ['经验1,850', '哈夫币125,000']),
+      t('82942', '控制与保障-2', ['使用任意工程/支援类特战干员，使用任意配备 5.45×39 / 9×39 弹药的武器，累计击败 2 名敌方特战干员'], ['经验2,100', '哈夫币125,000']),
+      t('82943', '控制与保障-3', ['完成 1 次淘汰高价值目标行动', '完成 1 次破坏物资室铁门行动', '完成 2 次清理目标区域敌人行动'], ['经验1,850', '哈夫币125,000']),
+      t('82944', '控制与保障-4', ['使用液氮/牧羊人时，成功撤离 1 次（收益 ≥ 750,000）', '使用蜂医/蝶时，累计成功对队友造成 500 点治疗'], ['经验2,100', '哈夫币125,000']),
+      t('82945', '控制与保障-5', ['完成 1 次标杆行动（铁穹 / 破壁者 / 夜莺 / 飞升 / 焰火 / 庇护者 / 折翼 / 黑潮 / 猎鸦人 / 诛星者 / 硬通货 / 紧急停堆）', '成功撤离 1 次'], ['经验1,850', '哈夫币175,000', '机械工蜂模型×2', '顶级安全箱1天权限卡×1'])
+    ]),
+    C('2-6 博物强识：基础收集', [
+      t('82946', '博物强识-1', ['任意机密/绝密行动，累计成功带出 5 件品质 ≥ 紫色的医疗物品 / 工具材料类收集品'], ['经验2,100', '哈夫币150,000']),
+      t('82947', '博物强识-2', ['累计成功带出 3 件品质 ≥ 紫色的工艺藏品 / 家居物品类收集品'], ['经验2,100', '哈夫币150,000']),
+      t('82948', '博物强识-3', ['累计成功带出 5 件品质 ≥ 紫色的电子物品类收集品'], ['经验2,100', '哈夫币150,000']),
+      t('82949', '博物强识-4', ['累计成功带出 5 件品质 ≥ 金色的能源燃料 / 资料情报类收集品'], ['经验2,100', '哈夫币150,000']),
+      t('82950', '博物强识-5', ['带出 1 件品质 ≥ 金色的医疗物品类收集品', '带出 2 件品质 ≥ 紫色的资料情报类收集品', '带出 1 件品质 ≥ 金色的工艺藏品类收集品'], ['经验2,100', '哈夫币250,000', '机械工蜂模型×2', '顶级安全箱1天权限卡×1'])
+    ]),
+    C('2-7 清洁工作', [
+      t('82951', '清道夫-1', ['任意机密/绝密行动，击败 18 名任意敌方士兵（队内进度共享）'], ['经验2,100', '哈夫币150,000']),
+      t('82952', '清道夫-2', ['击败 10 名任意敌方特殊兵种（盾兵 / 狙击兵 / 火箭兵 / 机枪兵 / 喷火兵 / 哈夫克重装净化者 / 首领卫士）'], ['经验2,100', '哈夫币150,000']),
+      t('82953', '清道夫-3', ['击败 8 名任意阿萨拉卫队特殊兵种', '击败 8 名任意哈夫克特殊兵种'], ['经验2,100', '哈夫币150,000']),
+      t('82954', '清道夫-4', ['击败 6 名任意首领卫队（博士 / 雷斯 / 德穆兰 / 渡鸦 / 典狱长 / 哈德森的随行卫队或战车、H47、H800）'], ['经验2,100', '哈夫币150,000']),
+      t('82955', '清道夫-5', ['任务目标未公开（图中标注为 ---），通常为前置任务的收尾挑战'], ['经验2,100', '哈夫币250,000', '机械工蜂模型×2', '顶级安全箱1天权限卡×1'])
+    ])
+  ]),
+
+  S('第 3 阶段', '暗夜传火', '#b388ff', [
+    C('赛季主线', [
+      t('82016', '特响，非常近', ['航天基地：宿舍区房间内指定地点，获取任务物品', '宿舍区房间内指定地点，超感回溯军情录音处遗留的语音线索'], ['经验1,950', '哈夫币250,000', '体能强化剂×5']),
+      t('82017', '旧钢琴', ['AZ3：后处理厂区域内，获取任务物品', '运输仓库附近建筑内，超感回溯录音带处遗留的语音线索', '应急火电站区域内，超感回溯阿萨尔的曲谱'], ['经验1,950', '哈夫币250,000']),
+      t('82018', '星光与篝火', ['长弓溪谷 / 零号大坝 / AZ3 的机密·永夜·超能行动，完成 1 次任意标杆行动', '巴克什或航天基地，在开局后 15 秒内成功撤离 1 次'], ['经验1,950', '哈夫币250,000', '高级子弹生产零件×2']),
+      t('82019', '破碎音符', ['航天基地：中控楼二层控制中心内，超感回溯军情录音处遗留的语音线索', '中控区二楼仓库货架上的指定地点，获取任务物品', '中控区室外沙地处，放置任务物品（需前往研发部门军需处购买）'], ['经验2,150', '哈夫币375,000', 'HOVK双发榴弹枪×1']),
+      t('82020', '对错难分', ['巴克什：阿萨拉营地内指定地点，获取任务物品', '营地内指定地点，超感回溯录音机处遗留的语音线索', '成功撤离 1 次（单局收益 ≥ 500,000）'], ['经验2,000', '哈夫币275,000', '.300 BLK TTV×200', '.300 BLK TTV×80']),
+      t('82021', '风沙里的琴音', ['AZ3：海水处理区外围，超感回溯哈夫克便携终端处遗留的语音线索', '海水处理区外围指定地点，放置任务物品', '核芯区一楼设施内，放置任务物品', '乏燃料处理厂内部区域，放置任务物品'], ['经验2,150', '哈夫币375,000', '高级咖啡豆×1'], ['单局完成']),
+      t('82022', '侦察火力', ['航天基地：水平试车场建筑内，超感回溯哈夫克便携终端处遗留的语音线索', '同处指定地点，获取任务物品', '码头会客室内，超感回溯阿萨尔的曲谱', '累计击败 5 名哈夫克士兵（进度可共享）'], ['经验1,750', '哈夫币350,000', '钛合金×3']),
+      t('82023', '暂停', ['AZ3：老科学院二楼控制中心内房间，获取任务物品', '同处指定地点，超感回溯哈夫克便携终端处遗留的语音线索', '携带任务物品，成功撤离'], ['经验1,750', '哈夫币375,000', '移动电缆×1', '赛季任务定制装备券×1'], ['单局完成'])
+    ]),
+    C('3-1 狙击精英', [
+      t('82963', '狙击精英-1', ['任意机密/绝密行动，使用任意精确射手步枪 / 栓动狙击步枪，累计击败 3 名敌方特战干员'], ['经验1,950', '哈夫币250,000', '5.45×39mm BS×100']),
+      t('82964', '狙击精英-2', ['使用任意配备可变倍率瞄准镜的栓动狙击步枪，累计击败 3 名敌方特战干员'], ['经验1,950', '哈夫币250,000', '6.8×51mm AP×60']),
+      t('82965', '狙击精英-3', ['使用 M700 狙击步枪 / 杠杆式步枪 / SKS 射手步枪 / M14 射手步枪，累计击败 3 名敌方特战干员'], ['经验1,950', '哈夫币300,000']),
+      t('82966', '狙击精英-4', ['使用任意精确射手步枪 / 栓动狙击步枪，在 30 米外累计击败 3 名敌方特战干员'], ['经验1,950', '哈夫币300,000']),
+      t('82967', '狙击精英-5', ['使用 R93 狙击步枪击败 1 名敌方特战干员', '使用 M14 射手步枪击败 1 名敌方特战干员', '使用任意手枪击败 1 名敌方特战干员'], ['经验2,200', '哈夫币350,000', '赛季任务定制装备券×1'])
+    ]),
+    C('3-2 金枪客', [
+      t('82956', '金枪客-1', ['上交 1 把按指定需求改装的 K437 突击步枪'], ['经验1,950', '哈夫币250,000', '.300 BLK TAC-TX×150']),
+      t('82957', '金枪客-2', ['任意机密/绝密行动，使用 K437 突击步枪，击败 3 名敌方特战干员'], ['经验1,950', '哈夫币250,000'], ['限制：入局装备价值 ≥ 750,000']),
+      t('82958', '金枪客-3', ['上交 1 把按指定需求改装的 AN94 突击步枪'], ['经验1,950', '哈夫币250,000', '5.45×39mm BS×150']),
+      t('82959', '金枪客-4', ['任意机密/绝密行动，使用 AN94 突击步枪，击败 3 名敌方特战干员'], ['经验1,950', '哈夫币250,000'], ['限制：入局装备价值 ≥ 750,000']),
+      t('82960', '金枪客-5', ['上交 1 把按指定需求改装的 PKM 通用机枪'], ['经验2,200', '哈夫币250,000', '7.62×54R BT×80']),
+      t('82961', '金枪客-6', ['任意机密/绝密行动，使用 PKM 通用机枪，击败 3 名敌方特战干员'], ['经验1,950', '哈夫币250,000'], ['限制：入局装备价值 ≥ 750,000']),
+      t('82962', '金枪客-7', ['使用 K437 突击步枪击败 1 名敌方特战干员', '使用 AN94 突击步枪击败 1 名敌方特战干员', '使用 PKM 通用机枪击败 1 名敌方特战干员'], ['经验2,200', '哈夫币350,000', '赛季任务定制装备券×1'])
+    ]),
+    C('3-3 博物馆幽灵', [
+      t('82968', '博物馆幽灵-1', ['阿坦亚遗址附近指定地点调查', '停车场附近指定地点调查', '巴克什集市附近指定地点调查'], ['经验1,950', '哈夫币250,000', '体能强化剂×2']),
+      t('82969', '博物馆幽灵-2', ['博物馆通向二楼的楼梯处，超感回溯摄像头处遗留的语音线索', '博物馆地下机房内指定地点，超感回溯卫星电话处遗留的语音线索'], ['经验1,950', '哈夫币250,000', '体能强化剂×2']),
+      t('82970', '博物馆幽灵-3', ['博物馆一楼圆桌处，超感回溯卫星电话处遗留的语音线索', '使用干员「回声」技能高级声波探测装置 1 次', '博物馆后方民房窗边，超感回溯望远镜处遗留的语音线索'], ['经验1,950', '哈夫币250,000', '体能强化剂×2']),
+      t('82971', '博物馆幽灵-4', ['集市旁大道的大垃圾箱旁，获取任务物品', '博物馆后方民房内，超感回溯军情录音处遗留的语音线索'], ['经验1,950', '哈夫币250,000', '体能强化剂×2']),
+      t('82972', '博物馆幽灵-5', ['零号大坝：大坝通向行政楼的关口处二楼房屋内，超感回溯收音机处遗留的语音线索', '大坝行政楼二楼走廊办公桌前，获取任务物品', 'AZ3：仿星器研究所内指定地点，超感回溯阿萨尔的曲谱'], ['经验2,200', '哈夫币350,000', '机械工蜂模型×2', '赛季任务定制装备券×1'])
+    ]),
+    C('3-4 战斗专家：区域猎手', [
+      t('82973', '区域猎手：行动开始', ['零号大坝 / 巴克什 / AZ3 的机密·绝密·永夜·超能·超临界行动，累计击败 3 名特战干员'], ['经验1,950', '哈夫币175,000', '体能强化剂×2']),
+      t('82974', '区域猎手：零号大坝', ['大坝东部区域（主副变电站及游客中心），累计击败 3 名特战干员'], ['经验1,950', '哈夫币175,000', '体能强化剂×2']),
+      t('82975', '区域猎手：巴别塔', ['巴克什巴别塔区域，累计击败 3 名特战干员'], ['经验1,950', '哈夫币200,000', '体能强化剂×2']),
+      t('82976', '区域猎手：AZ3', ['核电站核心区域（石棺和汽轮机室）及其西部区域（应急火电站和老科学院），累计击败 3 名特战干员'], ['经验1,950', '哈夫币200,000', '体能强化剂×2']),
+      t('82977', '我心永恒', ['任意机密/绝密行动，击败 2 名敌方特战干员'], ['经验2,200', '哈夫币250,000', '机械工蜂模型×2', '顶级安全箱1天权限卡×1'], ['限制：入局不能装备任何护甲'])
+    ]),
+    C('3-5 过河卒', [
+      t('82978', '过河卒-1', ['AZ3：废水堆放区指定地点，超感回溯卫星电话处遗留的语音线索', '核电站水道附近指定地点，获取任务物品'], ['经验1,950', '哈夫币125,000']),
+      t('82979', '过河卒-2', ['AZ3：老科学院一楼机房内，放置任务物品', '乏燃料处理厂厂房一楼会客处，超感回溯卫星电话处遗留的语音线索'], ['经验1,950', '哈夫币125,000']),
+      t('82980', '过河卒-3', ['AZ3：运输仓库内部控制台处，放置任务物品', '运输仓库内部员工工作间，超感回溯卫星电话处遗留的语音线索'], ['经验1,950', '哈夫币125,000']),
+      t('82981', '过河卒-4', ['航天基地：中控楼二楼会客处沙发旁，超感回溯卫星电话处遗留的语音线索', '中控楼前运输车内，获取任务物品', '工业区轨道上，放置任务物品'], ['经验1,950', '哈夫币125,000']),
+      t('82982', '过河卒-5', ['航天基地：宿舍区指定房间内，超感回溯卫星电话处遗留的语音线索', '宿舍区指定房间内，获取任务物品', '携带任务物品，成功撤离'], ['经验2,200', '哈夫币200,000', '哈夫克机密档案×1', '顶级安全箱1天权限卡×1'])
+    ]),
+    C('3-6 逃脱艺术：金蝉脱壳', [
+      t('82983', '逃脱艺术：自掏腰包', ['AZ3 / 零号大坝 / 长弓溪谷 的机密·永夜·超能行动，累计成功撤离 2 次'], ['经验1,950', '哈夫币125,000']),
+      t('82984', '逃脱艺术：金蝉脱壳', ['零号大坝：从维修通道（丢包撤离点）成功撤离 1 次', 'AZ3：从核岛防波堤 / 码头处卸载区 / 石棺后方丢包撤离点撤离 1 次', '航天基地：从试车场（丢包撤离点）成功撤离 1 次'], ['经验1,950', '哈夫币125,000']),
+      t('82985', '逃脱艺术：接力棒', ['零号大坝 / 长弓溪谷：从任意拉闸撤离点成功撤离 1 次', '巴克什：从浴场 / 巴别塔前拉闸撤离点成功撤离 1 次', '航天基地：从直升机拉闸撤离点成功撤离 1 次'], ['经验1,950', '哈夫币125,000']),
+      t('82986', '逃脱艺术：大干一票', ['AZ3：从石棺电梯撤离点撤离 1 次（需通过紧急停堆行动激活）', '巴克什：从巴别塔塔顶撤离点撤离 1 次（需上交身份牌）'], ['经验1,950', '哈夫币150,000']),
+      t('82987', '逃脱艺术：唯我独尊', ['航天基地：从火箭撤离点（需飞升者行动激活）/ 直升机拉闸撤离点撤离 1 次', 'AZ3：从石棺电梯撤离点 / 石棺后方撤离点撤离 1 次'], ['经验2,200', '哈夫币200,000', '哈夫克机密档案×1', '顶级安全箱1天权限卡×1'], ['限制：≥4级护甲头盔，禁带武器/胸挂/背包'])
+    ]),
+    C('3-7 博物强识：精致人生', [
+      t('82988', '精致人生-1', ['累计成功带出 5 件品质 ≥ 紫色的工艺藏品 / 能源燃料 / 医疗物品类收集品'], ['经验1,950', '哈夫币125,000']),
+      t('82989', '精致人生-2', ['成功首次开启 6 次弹药箱或大武器箱'], ['经验1,950', '哈夫币125,000']),
+      t('82990', '精致人生-3', ['累计成功带出 5 件品质 ≥ 金色的资料情报 / 居家物品 / 电子物品类收集品'], ['经验1,950', '哈夫币125,000']),
+      t('82991', '精致人生-4', ['成功首次开启 4 次手提箱'], ['经验1,950', '哈夫币125,000']),
+      t('82992', '精致人生-5', ['成功首次开启 1 次小保险箱', '开启 1 次航空储物箱', '开启 1 次保险箱'], ['经验2,200', '哈夫币175,000', '哈夫克机密档案×1', '顶级安全箱1天权限卡×1'])
+    ]),
+    C('3-8 博物强识：风卷残云', [
+      t('82993', '拾荒者-1', ['成功首次开启 6 次登山包或旅行包'], ['经验1,950', '哈夫币125,000']),
+      t('82994', '拾荒者-2', ['累计成功带出 6 件品质 ≥ 紫色的工艺藏品 / 工具材料 / 资料情报类收集品'], ['经验1,950', '哈夫币125,000']),
+      t('82995', '拾荒者-3', ['成功首次开启 3 次水泥搅拌车'], ['经验1,950', '哈夫币125,000']),
+      t('82996', '拾荒者-4', ['累计成功带出 3 件品质 ≥ 金色的工艺藏品类收集品'], ['经验1,950', '哈夫币125,000']),
+      t('82997', '拾荒者-5', ['成功首次开启 3 次垃圾箱', '开启 4 次储物柜'], ['经验2,200', '哈夫币175,000', '哈夫克机密档案×1', '顶级安全箱1天权限卡×1'])
+    ])
+  ]),
+
+  S('第 4 阶段', '余烬不灭', '#ff6b6b', [
+    C('赛季主线（终章）', [
+      t('82024', '高压突围', ['AZ3 / 航天基地 的机密·绝密·超能行动，完成 1 次任意标杆行动', '累计成功带出 3 件品质 ≥ 金色的工艺藏品 / 资料情报 / 电子物品类收集品'], ['经验1,750', '哈夫币375,000', '高级咖啡豆×1'], ['单局完成']),
+      t('82025', '星光初现', ['AZ3：反应堆核心区内指定地点，超感回溯哈夫克便携终端处遗留的语音线索', '反应堆核心区内指定地点，获取任务物品', '核电站核心区域（石棺和汽轮机室）累计击败 5 名哈夫克士兵', '成功撤离'], ['经验1,750', '哈夫币650,000'], ['单局完成']),
+      t('82026', '连根拔起', ['AZ3 / 巴克什 / 航天基地 的机密·绝密·超临界行动，累计完成 2 次任意标杆行动', '累计成功撤离 2 次（单局收益 ≥ 1,000,000 哈夫币）'], ['经验2,050', '哈夫币650,000', 'GTS防弹头盔×1'], ['撤离失败重置']),
+      t('82027', '凝固的血', ['巴克什：巴别塔控制中心内指定地点，获取任务物品', '同处超感回溯作战终端处遗留的语音线索', '携带任务物品，成功撤离'], ['经验2,050', '哈夫币500,000', '单兵防弹护甲×1'], ['单局完成']),
+      t('82028', '全线清剿', ['长弓溪谷 / 零号大坝 / 巴克什：击败 6 名阿萨拉普通士兵、3 名阿萨拉特殊兵种', '巴克什 / 航天基地 / AZ3：击败 6 名哈夫克普通士兵、3 名哈夫克特殊兵种', '任意机密/绝密行动：击败 2 名敌方特战干员'], ['经验2,100', '哈夫币500,000', '绝密服务器×1'], ['撤离失败重置', '本赛季赠品']),
+      t('82029', '治愈之声', ['AZ3：仿星器研究所内指定地点，超感回溯录音带处遗留的语音线索', '仿星器研究所内指定地点，放置任务物品', '老科学院内指定地点，超感回溯哈夫克便携终端处遗留的语音线索', '老科学院内指定地点，获取任务物品', '携带任务物品，成功撤离'], ['经验（图未标注）', '哈夫币777,777', '顶级安全箱7天权限卡×1'], ['撤离失败重置', '赛季终章'])
+    ])
+  ])
+];
+
+/* ============ 星数体系（网络攻略整理，截图未标注，以游戏内为准） ============ */
+const NEED = [6, 12, 14, 0]; // 每阶段解锁下一阶段所需支线星数（攻略图阶段标题 ★N）；第 4 阶段只有主线、无 ★
+const CHAIN_STAR = {
+  '1-1 配给运用作战': 3, '1-2 再难告别': 3, '1-3 逃脱艺术：基础': 2, '1-4 保障有力': 2,
+  '2-1 披坚执锐': 5, '2-2 寻味阿萨拉': 4, '2-3 常胜冠军': 3, '2-4 搜索与歼灭': 3,
+  '2-5 控制与保障': 3, '2-6 博物强识：基础收集': 3, '2-7 清洁工作': 2,
+  '3-1 狙击精英': 5, '3-2 金枪客': 5, '3-3 博物馆幽灵': 5, '3-4 战斗专家：区域猎手': 4,
+  '3-5 过河卒': 4, '3-6 逃脱艺术：金蝉脱壳': 4, '3-7 博物强识：精致人生': 3, '3-8 博物强识：风卷残云': 3
+};
+const SIDESTARS = Object.keys(CHAIN_STAR).reduce((a, k) => a + CHAIN_STAR[k], 0);
+
+/* ============ 统计 ============ */
+const ALL = [];
+DATA.forEach((s, si) => s.chains.forEach((c, ci) => c.tasks.forEach((task, ti) => {
+  task._s = si; task._c = ci; task._t = ti;
+  ALL.push(task);
+})));
+const TOTAL = ALL.length;
+const countRW = kw => ALL.reduce((a, x) => a + x.rw.filter(r => r.includes(kw)).length, 0);
+const numRW = kw => ALL.reduce((a, x) => {
+  let s = 0;
+  x.rw.forEach(r => { if (r.startsWith(kw)) { const m = r.match(/[\d,]+/); if (m) s += parseInt(m[0].replace(/,/g, ''), 10) || 0; } });
+  return a + s;
+}, 0);
+const CARD1 = countRW('顶级安全箱1天');
+const HBTOTAL = numRW('哈夫币');
+const EXPTOTAL = numRW('经验');
+const RULE = ALL.filter(x => x.tags.some(g => g.includes('限制'))).length;
+const ONESHOT = ALL.filter(x => x.tags.includes('单局完成')).length;
+
+const fmt = n => n.toLocaleString('en-US');
+
+/* ============ 头部统计 ============ */
+document.getElementById('stats').innerHTML = [
+  `<div class="pill">任务总数 <b>${TOTAL}</b></div>`,
+  `<div class="pill">阶段 <b>4</b> · 分支 <b>${DATA.reduce((a, s) => a + s.chains.length, 0)}</b></div>`,
+  `<div class="pill">哈夫币合计 <b>${fmt(HBTOTAL)}</b></div>`,
+  `<div class="pill gold">顶级安全箱1天卡 <b>${CARD1}</b> 张</div>`,
+  `<div class="pill gold">支线星 <b>${SIDESTARS}★</b> · 解锁门槛 6/12/14★（阶段 4 只有主线）</div>`
+].join('');
+
+/* ============ 建树（左右双翼布局） ============ */
+const X = [0, 326, 606, 900];
+const W = {root: 340, stage: 274, chain: 262, task: 262};
+const H = {root: 106, stage: 88, chain: 46, task: 36};
+
+const root = {
+  key: 'root', type: 'root', w: W.root, h: H.root, depth: 0, collapsed: false, dir: 0,
+  label: '3×3 保险箱任务', children: []
+};
+DATA.forEach((s, si) => {
+  const skey = 's' + si;
+  const sn = {
+    key: skey, type: 'stage', w: W.stage, h: H.stage, depth: 1, collapsed: true, dir: si < 2 ? 1 : -1,
+    code: s.code, name: s.name, color: s.color, children: [], parent: root, si
+  };
+  s.chains.forEach((c, ci) => {
+    const ckey = skey + '-c' + ci;
+    const cn = {
+      key: ckey, type: 'chain', w: W.chain, h: H.chain, depth: 2, collapsed: true, dir: sn.dir,
+      name: c.name, color: s.color, children: [], parent: sn, count: c.tasks.length
+    };
+    c.tasks.forEach((task, ti) => {
+      cn.children.push({
+        key: ckey + '-t' + ti, type: 'task', w: W.task, h: H.task, depth: 3, collapsed: true, dir: sn.dir,
+        data: task, color: s.color, children: [], parent: cn
+      });
+    });
+    sn.children.push(cn);
+  });
+  root.children.push(sn);
+});
+
+function measure(n) {
+  const kids = (!n.collapsed && n.children.length) ? n.children : [];
+  if (!kids.length) return n.h + (n.type === 'task' ? 8 : 12);
+  let s = 0;
+  kids.forEach(k => s += measure(k));
+  if (n.type === 'stage') s += 30;
+  return s;
+}
+function measureList(l) { return l.reduce((a, n) => a + measure(n), 0); }
+
+function walk(n, depth, y) {
+  n.depth = depth;
+  n.x = n.dir === 1 ? X[Math.min(depth, 3)] : -(X[Math.min(depth, 3)] + n.w);
+  const kids = (!n.collapsed && n.children.length) ? n.children : [];
+  n.vis = kids;
+  if (!kids.length) {
+    n.y = y + n.h / 2;
+    return y + n.h + (n.type === 'task' ? 8 : 12);
+  }
+  let yy = y;
+  kids.forEach(k => { yy = walk(k, depth + 1, yy); });
+  n.y = (kids[0].y + kids[kids.length - 1].y) / 2;
+  if (n.type === 'stage') yy += 30;
+  return yy;
+}
+function shift(list, dy) {
+  list.forEach(n => { n.y += dy; if (n.vis.length) shift(n.vis, dy); });
+}
+
+function layout() {
+  const rightKids = root.children.filter(s => s.dir === 1);
+  const leftKids = root.children.filter(s => s.dir === -1);
+  const rh = measureList(rightKids), lh = measureList(leftKids);
+  let y1 = 0, y2 = 0;
+  rightKids.forEach(k => { y1 = walk(k, 1, y1); });
+  leftKids.forEach(k => { y2 = walk(k, 1, y2); });
+  const total = Math.max(y1, y2);
+  shift(rightKids, (total - y1) / 2);
+  shift(leftKids, (total - y2) / 2);
+  root.vis = root.children;
+  root.y = total / 2;
+  root.x = -W.root / 2;
+  root.mapH = total;
+  root.mapW = 2 * (X[3] + W.task);
+}
+
+function visibleNodes() {
+  const out = [];
+  (function w2(n) { out.push(n); n.vis.forEach(w2); })(root);
+  return out;
+}
+
+/* ============ 渲染 ============ */
+const nodesEl = document.getElementById('nodes');
+const svg = document.getElementById('links');
+const canvas = document.getElementById('canvas');
+const stageEl = document.getElementById('stage');
+
+const state = { zoom: 0.62, panX: 40, panY: 40, sel: null, focus: null };
+
+function nodeHTML(n) {
+  if (n.type === 'root') {
+    return `<span class="rcode">DELTA FORCE · SEASON 12「微光」</span>
+      <span class="rname">3×3 保险箱任务</span>
+      <span class="rsub">行动计划 4 阶段 · ${TOTAL} 任务 · 主线+支线星数逐阶解锁</span>`;
+  }
+  if (n.type === 'stage') {
+    const cnt = n.children.reduce((a, c) => a + c.children.length, 0);
+    const sStars = n.children.reduce((a, c) => a + (CHAIN_STAR[c.name] || 0), 0);
+    const unlock = n.si >= 3
+      ? '终章：仅 6 个主线，做完即毕业（无支线、不用星）'
+      : NEED[n.si] === 0
+        ? '解锁下一阶：主线全做即可（第 4 阶段免支线星）'
+        : '解锁下一阶：主线全做 + 支线 ' + NEED[n.si] + '★';
+    return `<span class="scode">${n.code}</span><span class="sname">${n.name}</span>
+      <span class="scnt">${n.children.length} 分支 · ${cnt} 任务${sStars ? ' · 支线合计 ' + sStars + '★' : ''}</span>
+      <span class="sneed">${unlock}</span>`;
+  }
+  if (n.type === 'chain') {
+    const open = !n.collapsed;
+    const st = CHAIN_STAR[n.name] || 0;
+    const tag = st ? `<span class="stars">★${st}</span>` : `<span class="mtag">主线·必做</span>`;
+    return `<span class="cname">${n.name}</span>${tag}<span class="cnt">${n.count}</span>
+      <span class="plus">${open ? '−' : '+'}</span>`;
+  }
+  const d = n.data;
+  const warn = d.tags.length ? `<span class="warn">!</span>` : '';
+  return `<span class="tid">${d.id}</span><span class="tname">${d.name}</span>${warn}`;
+}
+
+function render() {
+  layout();
+  const all = visibleNodes();
+  const list = all.filter(n => state.focus === null
+    ? true
+    : (n.type === 'task' || n.type === 'chain' || n.key === 's' + state.focus));
+  let html = '';
+  list.forEach(n => {
+    const cls = 'node node-' + n.type + (n.type === 'task' && state.sel === n.key ? ' sel' : '');
+    const style = `left:${n.x}px;top:${n.y - n.h / 2}px;width:${n.w}px;height:${n.h}px;--c:${n.color || '#4fc3f7'}`;
+    html += `<div class="${cls}" style="${style}" data-key="${n.key}">${nodeHTML(n)}</div>`;
+  });
+  nodesEl.innerHTML = html;
+
+  let paths = '';
+  list.forEach(n => {
+    n.vis.forEach(k => {
+      let x1, y1, x2, y2;
+      if (n.type === 'root') {
+        x1 = k.dir === 1 ? n.x + n.w : n.x;
+        x2 = k.dir === 1 ? k.x : k.x + k.w;
+      } else if (n.dir === 1) {
+        x1 = n.x + n.w; x2 = k.x;
+      } else {
+        x1 = n.x; x2 = k.x + k.w;
+      }
+      y1 = n.y; y2 = k.y;
+      const dx = Math.max(24, Math.abs(x2 - x1) * 0.45);
+      const c1 = x1 + (x2 > x1 ? dx : -dx);
+      const c2 = x2 + (x2 > x1 ? -dx : dx);
+      const col = k.color || n.color || '#4fc3f7';
+      const op = n.type === 'root' ? .5 : .34;
+      paths += `<path d="M${x1},${y1} C${c1},${y1} ${c2},${y2} ${x2},${y2}" fill="none" stroke="${col}" stroke-opacity="${op}" stroke-width="${n.type === 'root' ? 2 : 1.5}"/>`;
+    });
+  });
+  svg.setAttribute('width', root.mapW);
+  svg.setAttribute('height', Math.max(root.mapH, 400));
+  svg.innerHTML = paths;
+  nodesEl.style.position = 'absolute';
+
+  applyTransform();
+  document.getElementById('zval').textContent = Math.round(state.zoom * 100) + '%';
+}
+
+function applyTransform() {
+  canvas.style.transform = `translate(${state.panX}px,${state.panY}px) scale(${state.zoom})`;
+}
+
+function bboxOf(keys) {
+  const list = visibleNodes().filter(n => !keys || keys.some(k => n.key === k || n.key.startsWith(k)));
+  if (!list.length) return {x: 0, y: 0, w: 800, h: 600};
+  let x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9;
+  list.forEach(n => {
+    x1 = Math.min(x1, n.x); y1 = Math.min(y1, n.y - n.h / 2);
+    x2 = Math.max(x2, n.x + n.w); y2 = Math.max(y2, n.y + n.h / 2);
+  });
+  return {x: x1, y: y1, w: x2 - x1, h: y2 - y1};
+}
+
+function fit(b, minZ, anchor) {
+  const vw = stageEl.clientWidth, vh = stageEl.clientHeight;
+  let z = Math.min((vw - 150) / Math.max(b.w, 1), (vh - 150) / Math.max(b.h, 1), 1.05);
+  z = Math.max(z, minZ || 0.28);
+  state.zoom = z;
+  const overW = b.w * z > vw - 150, overH = b.h * z > vh - 150;
+  state.panX = overW ? 75 - b.x * z : 75 + (vw - 150 - b.w * z) / 2 - b.x * z;
+  if (overH) state.panY = anchor ? vh * 0.5 - anchor.y * z : 92 - b.y * z;
+  else state.panY = 85 + (vh - 150 - b.h * z) / 2 - b.y * z;
+  applyTransform();
+  document.getElementById('zval').textContent = Math.round(state.zoom * 100) + '%';
+}
+
+function centerOn(n) {
+  const vw = stageEl.clientWidth, vh = stageEl.clientHeight;
+  const occl = panel.classList.contains('open') ? 392 : 0;
+  state.zoom = 0.75;
+  state.panX = (vw - occl) * 0.36 - (n.x + n.w / 2) * state.zoom;
+  state.panY = vh * 0.46 - n.y * state.zoom;
+  applyTransform();
+  document.getElementById('zval').textContent = Math.round(state.zoom * 100) + '%';
+}
+
+/* ============ 交互 ============ */
+const byKey = {};
+(function idx(n) { byKey[n.key] = n; n.children.forEach(idx); })(root);
+
+function toggle(n) {
+  if (n.type === 'root') return;
+  const sx = n.x * state.zoom + state.panX, sy = n.y * state.zoom + state.panY;
+  n.collapsed = !n.collapsed;
+  render();
+  const nx = n.x * state.zoom + state.panX, ny = n.y * state.zoom + state.panY;
+  state.panX += sx - nx; state.panY += sy - ny;
+  applyTransform();
+}
+
+nodesEl.addEventListener('click', e => {
+  const el = e.target.closest('.node');
+  if (!el) return;
+  const n = byKey[el.dataset.key];
+  if (!n) return;
+  if (n.type === 'task') { state.sel = n.key; render(); showTask(n); centerOnSoft(n); }
+  else toggle(n);
+});
+
+function centerOnSoft(n) {
+  const vw = stageEl.clientWidth, vh = stageEl.clientHeight;
+  const sx = n.x * state.zoom + state.panX, sy = n.y * state.zoom + state.panY;
+  if (sx < 60 || sx > vw - 300 || sy < 90 || sy > vh - 60) {
+    state.panX += vw * 0.34 - sx;
+    state.panY += vh * 0.5 - sy;
+    applyTransform();
+  }
+}
+
+/* 拖拽 / 缩放 */
+let drag = null;
+stageEl.addEventListener('mousedown', e => {
+  if (e.target.closest('.node') || e.target.closest('#toolbar') || e.target.closest('#zoombar')) return;
+  drag = {x: e.clientX, y: e.clientY, px: state.panX, py: state.panY};
+  stageEl.classList.add('dragging');
+});
+window.addEventListener('mousemove', e => {
+  if (!drag) return;
+  state.panX = drag.px + (e.clientX - drag.x);
+  state.panY = drag.py + (e.clientY - drag.y);
+  applyTransform();
+});
+window.addEventListener('mouseup', () => { drag = null; stageEl.classList.remove('dragging'); });
+
+stageEl.addEventListener('wheel', e => {
+  if (e.target.closest('#panel')) return;
+  e.preventDefault();
+  const r = stageEl.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const z0 = state.zoom;
+  const z = Math.min(1.6, Math.max(0.18, z0 * (e.deltaY > 0 ? 0.9 : 1.1)));
+  state.panX = mx - (mx - state.panX) * (z / z0);
+  state.panY = my - (my - state.panY) * (z / z0);
+  state.zoom = z;
+  applyTransform();
+  document.getElementById('zval').textContent = Math.round(z * 100) + '%';
+}, {passive: false});
+
+/* 工具条 */
+function clearToolbar() { document.querySelectorAll('#toolbar button').forEach(b => b.classList.remove('on')); }
+
+function overview() {
+  DATA.forEach((_, i) => {
+    const s = byKey['s' + i];
+    s.collapsed = false;
+    s.children.forEach(c => c.collapsed = true);
+  });
+  state.focus = null;
+  clearToolbar();
+  document.getElementById('btnOverview').classList.add('on');
+  document.getElementById('hint').innerHTML = HINT_DEFAULT;
+  render();
+  fit(bboxOf(null));
+}
+
+function focusStage(i) {
+  DATA.forEach((_, k) => {
+    const s = byKey['s' + k];
+    s.collapsed = k !== i;
+    s.children.forEach(c => c.collapsed = true);
+  });
+  state.focus = i;
+  clearToolbar();
+  const btn = document.querySelector(`#toolbar button[data-stage="${i}"]`);
+  if (btn) btn.classList.add('on');
+  document.getElementById('hint').innerHTML = '聚焦<b>第 ' + (i + 1) + ' 阶段</b> · 金色 <b>★N</b> 为完成该支线全部任务可得星数'
+    + (i >= 3 ? ' · 本阶段只有主线，无需星' : ' · 本阶段需 <b style="color:#ffd166">' + NEED[i] + '★</b> 解锁下一阶段');
+  render();
+  fit(bboxOf(['s' + i]), 0.66, byKey['s' + i]);
+}
+
+const HINT_DEFAULT = '<b>点击分支</b>展开任务 · <b>点击任务</b>看详情 · 金色 <b>★N</b> = 完成该支线全部任务可得星数 · 阶段卡金线 = 解锁下一阶所需星';
+function expandAll() {
+  DATA.forEach((_, i) => { const s = byKey['s' + i]; s.collapsed = false; s.children.forEach(c => c.collapsed = false); });
+  state.focus = null;
+  clearToolbar();
+  document.getElementById('btnExpand').classList.add('on');
+  render();
+  fit(bboxOf(null), 0.18);
+  document.getElementById('hint').innerHTML = '已展开全部 <b>' + TOTAL + ' 个任务</b> · <b>滚轮</b>放大查看 · <b>拖拽</b>平移 · 单阶段细看请用上方「阶段」按钮';
+}
+
+document.getElementById('btnOverview').onclick = overview;
+document.querySelectorAll('#toolbar button[data-stage]').forEach(b => {
+  b.onclick = () => focusStage(+b.dataset.stage);
+});
+document.getElementById('btnExpand').onclick = expandAll;
+document.getElementById('btnInfo').onclick = () => showOverview();
+document.getElementById('zi').onclick = () => { state.zoom = Math.min(1.6, state.zoom * 1.15); applyTransform(); document.getElementById('zval').textContent = Math.round(state.zoom * 100) + '%'; };
+document.getElementById('zo').onclick = () => { state.zoom = Math.max(0.18, state.zoom / 1.15); applyTransform(); document.getElementById('zval').textContent = Math.round(state.zoom * 100) + '%'; };
+document.getElementById('zf').onclick = () => fit(bboxOf(null));
+
+/* 搜索 */
+const qEl = document.getElementById('q');
+qEl.addEventListener('input', () => {
+  const q = qEl.value.trim();
+  const hitEl = document.getElementById('hits');
+  if (document.getElementById('listView').classList.contains('on')) {
+    let n = 0;
+    document.querySelectorAll('#listBody .ltask').forEach(el => {
+      const ok = !q || el.textContent.toLowerCase().includes(q.toLowerCase());
+      el.style.display = ok ? '' : 'none';
+      if (ok) n++;
+    });
+    document.querySelectorAll('#listBody .lchain').forEach(el => {
+      const any = [...el.querySelectorAll('.ltask')].some(x => x.style.display !== 'none');
+      el.style.display = any ? '' : 'none';
+    });
+    document.querySelectorAll('#listBody .lstage').forEach(el => {
+      const any = [...el.querySelectorAll('.ltask')].some(x => x.style.display !== 'none');
+      el.style.display = any ? '' : 'none';
+    });
+    hitEl.textContent = q ? n + ' 项' : '';
+    return;
+  }
+  document.querySelectorAll('.node').forEach(el => el.classList.remove('hit', 'dim'));
+  if (!q) { hitEl.textContent = ''; return; }
+  // 全部展开以便定位
+  state.focus = null;
+  DATA.forEach((_, i) => { const s = byKey['s' + i]; s.collapsed = false; s.children.forEach(c => c.collapsed = false); });
+  render();
+  const hits = ALL.filter(x => (x.id + x.name + x.obj.join('')).toLowerCase().includes(q.toLowerCase()));
+  hitEl.textContent = hits.length ? hits.length + ' 项' : '无';
+  const hitKeys = new Set(hits.map(x => 's' + x._s + '-c' + x._c + '-t' + x._t));
+  document.querySelectorAll('.node').forEach(el => {
+    if (hitKeys.has(el.dataset.key)) el.classList.add('hit');
+    else if (el.dataset.key !== 'root') el.classList.add('dim');
+  });
+  if (hits.length === 1) {
+    const n = byKey['s' + hits[0]._s + '-c' + hits[0]._c + '-t' + hits[0]._t];
+    centerOnSoft(n);
+  }
+});
+
+/* ============ 右侧面板 ============ */
+const panel = document.getElementById('panel');
+const pclose = document.getElementById('pclose');
+
+function openPanel() {
+  panel.classList.add('open');
+  pclose.classList.add('on');
+}
+function closePanel() {
+  panel.classList.remove('open');
+  pclose.classList.remove('on');
+}
+pclose.onclick = closePanel;
+
+function chipCls(r) {
+  if (r.startsWith('哈夫币')) return 'hb';
+  if (r.startsWith('经验')) return 'exp';
+  if (r.includes('权限卡')) return 'card';
+  return '';
+}
+
+function showTask(n) {
+  const d = n.data;
+  const s = DATA[d._s];
+  panel.innerHTML = `
+    <div class="p-card" style="--c:${s.color}">
+      <div class="crumb"><i>${s.code} · ${s.name}</i> › ${s.chains[d._c].name}</div>
+      <div class="tname-big">${d.name}</div>
+      <div class="tid-big">任务编号 ${d.id}</div>
+      ${d.tags.length ? `<div class="badges">${d.tags.map(g => `<span class="badge">${g}</span>`).join('')}</div>` : ''}
+      <div class="sec">任务目标</div>
+      <ul class="obj" style="--c:${s.color}">${d.obj.map(o => `<li>${o}</li>`).join('')}</ul>
+      <div class="sec">任务奖励</div>
+      <div class="chips">${d.rw.map(r => `<span class="chip ${chipCls(r)}">${r}</span>`).join('')}</div>
+    </div>
+    <div class="p-card">
+      <div class="p-title">所属阶段进度</div>
+      <div class="note">${s.code} · ${s.name} — 共 ${s.chains.length} 个分支 / ${s.chains.reduce((a, c) => a + c.tasks.length, 0)} 个任务</div>
+      <div class="note" style="margin-top:6px">${
+        d._s >= 3
+          ? '第 4 阶段为<b>终章</b>：完成全部 6 个主线即达成行动计划，无支线、不用星。'
+          : (() => {
+              const cn = s.chains[d._c].name;
+              const cv = CHAIN_STAR[cn] || 0;
+              const head = NEED[d._s] === 0
+                ? `解锁第 4 阶段 = <b>本阶段主线全部完成即可</b>（免支线星）。`
+                : `解锁第 ${d._s + 2} 阶段 = 本阶段<b>主线全部完成</b> + 支线攒够 <b style="color:#ffd166">${NEED[d._s]}★</b>。`;
+              const tail = cv
+                ? `本支线「${cn.replace(/（.*）/, '')}」全部做完可得 <b style="color:#ffd166">${cv}★</b>${NEED[d._s] === 0 ? '（仅作奖励，不影响解锁）' : ''}。`
+                : `本条为主线，是解锁下一阶段的<b>前置条件</b>，本身不计星。`;
+              return head + tail;
+            })()
+      }</div>
+      <div class="stagebar">
+        ${DATA.map((x, i) => `<i style="flex:${x.chains.reduce((a, c) => a + c.tasks.length, 0)};background:${x.color};opacity:${i === d._s ? 1 : .28}"></i>`).join('')}
+      </div>
+      <div class="legend">${DATA.map(x => `<s><u style="background:${x.color}"></u>${x.name}</s>`).join('')}</div>
+    </div>`;
+  openPanel();
+}
+
+function showOverview() {
+  const rows = DATA.map((s, i) => {
+    const cnt = s.chains.reduce((a, c) => a + c.tasks.length, 0);
+    const cards = s.chains.reduce((a, c) => a + c.tasks.filter(x => x.rw.some(r => r.includes('顶级安全箱1天'))).length, 0);
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12px">
+      <u style="width:8px;height:8px;border-radius:2px;background:${s.color};display:inline-block;flex:0 0 auto"></u>
+      <span style="color:#c8d3e2;flex:1">${s.name}</span>
+      <span style="color:#66748a">${cnt} 任务</span>
+      <span style="color:#ffb0b0">${cards} 张卡</span></div>`;
+  }).join('');
+  panel.innerHTML = `
+    <div class="p-title">S12 3×3 保险箱 · 数据总览</div>
+    <div class="p-card">
+      <div class="kpi">
+        <div><span>任务总数</span><b>${TOTAL}</b></div>
+        <div><span>分支 / 阶段</span><b>${DATA.reduce((a, s) => a + s.chains.length, 0)} / 4</b></div>
+        <div><span>哈夫币合计</span><b style="color:#ffd166">${fmt(HBTOTAL)}</b></div>
+        <div><span>经验合计</span><b style="color:#7fb2ff">${fmt(EXPTOTAL)}</b></div>
+        <div><span>顶级安全箱1天卡</span><b style="color:#ff8f8f">${CARD1} 张</b></div>
+        <div><span>单局 / 限制任务</span><b>${ONESHOT} / ${RULE}</b></div>
+      </div>
+      <div class="sec">各阶段任务量</div>
+      ${rows}
+    </div>
+    <div class="p-card">
+      <div class="p-title">阶段解锁 · 星级门槛</div>
+      <div class="note" style="margin-bottom:10px">规则：完成本阶段<b>全部主线</b> + 支线攒够<b>本阶段星数</b> → 解锁下一阶段（第 1/2/3 阶段分别需 <b>6 / 12 / 14★</b>）。每条支线需<b>完成其全部任务</b>才计入整颗星；<b>第 4 阶段只有主线、没有 ★</b>。</div>
+      ${DATA.map((s, i) => {
+        const chains = s.chains.filter(c => CHAIN_STAR[c.name]);
+        const sum = chains.reduce((a, c) => a + CHAIN_STAR[c.name], 0);
+        const line = chains.map(c => `${c.name.replace(/（.*）/, '')}<i style="color:#ffd166;font-style:normal;font-weight:700">★${CHAIN_STAR[c.name]}</i>`).join(' · ');
+        return `<div style="margin-bottom:11px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:4px">
+            <u style="width:8px;height:8px;border-radius:2px;background:${s.color};display:inline-block;flex:0 0 auto"></u>
+            <span style="color:#c8d3e2">${s.code} · ${s.name}</span>
+            <span style="color:#ffd166;font-weight:700;margin-left:auto;flex:0 0 auto">${i >= 3 ? '终章' : NEED[i] === 0 ? '免星' : '需 ' + NEED[i] + '★'}</span></div>
+          <div style="font-size:11px;color:#8a97ab;line-height:1.9;padding-left:16px">${line || '— 无支线，主线毕业 —'}<br>
+          <span style="color:#66748a">${i >= 3 ? '' : NEED[i] === 0 ? '支线合计 ' + sum + '★（仅作奖励，不影响解锁）' : '支线合计 ' + sum + '★' + (sum > NEED[i] ? '（富余 ' + (sum - NEED[i]) + '★，可少做）' : '')}</span></div>
+        </div>`;
+      }).join('')}
+      <div class="note" style="margin-top:4px">省事拿星参考：阶段1 配给运用作战3+再难告别3（6★ 刚好）；阶段2 披坚执锐5+寻味阿萨拉4+常胜冠军3（12★ 刚好）；阶段3 博物馆幽灵5+区域猎手4+过河卒4+逃脱艺术4（17★，富余 3★）。</div>
+    </div>
+    <div class="p-card">
+      <div class="p-title">关键奖励</div>
+      <div class="chips">
+        <span class="chip card">顶级安全箱1天权限卡 ×${CARD1}</span>
+        <span class="chip card">顶级安全箱7天权限卡 ×1</span>
+        <span class="chip card">绝密服务器 ×1（82028）</span>
+        <span class="chip">哈夫克机密档案 ×${countRW('哈夫克机密档案')}</span>
+        <span class="chip">机械工蜂模型 ×${countRW('机械工蜂模型') * 2}</span>
+        <span class="chip">赛季任务定制装备券 ×${countRW('赛季任务定制装备券')}</span>
+      </div>
+      <div class="note" style="margin-top:10px">完成全部 4 阶段主线 + 支线星级后，领取赛季 3×3（9 格）顶级安全箱权限。</div>
+    </div>
+    <div class="p-card">
+      <div class="p-title">3×3 解锁三件套（图外补充）</div>
+      <div class="note">
+        <b>① 行动计划</b>：4 个阶段全部主线通关，并用支线补足阶段星级（6 / 12 / 14 星，第 4 阶段只有主线）。<br>
+        <b>② 收集者委托</b>：每日刷新的上交委托，累计完成 2 轮。<br>
+        <b>③ 命运契约</b>：高难挑战中任选 2 项完成（7 选 2）。<br>
+        三者同步达标后，仓库领取「顶级安全箱」赛季权限卡，使用后本赛季 3×3 生效。
+      </div>
+      <div class="note" style="margin-top:8px;color:#66748a">※ 星数取自攻略图阶段标题（第一阶段 ♦7 ★6、第二阶段 ♦8 ★12、第三阶段 ♦8 ★14、第四阶段无 ★）与各支线标题（如 3-3 博物馆幽灵 ★5、3-6 逃脱艺术 ★4）。3-1 / 3-2（金枪客、狙击精英 = 5★）标题页未提供，仍为推算；以游戏内任务面板为准。</div>
+    </div>`;
+  openPanel();
+}
+
+/* ============ 任务总览列表 ============ */
+let listStage = -1;
+function renderList() {
+  const body = document.getElementById('listBody');
+  body.innerHTML = DATA.map((s, si) => {
+    if (listStage >= 0 && listStage !== si) return '';
+    const cnt = s.chains.reduce((a, c) => a + c.tasks.length, 0);
+    return `<section class="lstage" style="--c:${s.color}">
+      <h2><i></i>${s.code} · ${s.name}</h2>
+      <div class="lsub">${s.chains.length} 个分支 / ${cnt} 个任务 · ${si >= 3 ? '终章：只有主线，做完即毕业（不用星）' : NEED[si] === 0 ? '解锁下一阶段：主线全做即可（第 4 阶段免星）' : '解锁下一阶段：主线全做 + 支线 ' + NEED[si] + '★'}</div>
+      ${s.chains.map(c => `
+        <div class="lchain">
+          <h3>${c.name}<span>${CHAIN_STAR[c.name] ? '★' + CHAIN_STAR[c.name] + ' · ' + c.tasks.length + ' 任务全完成得 ' + CHAIN_STAR[c.name] + '★'  : '主线 · 必做 · ' + c.tasks.length + ' 任务'}</span></h3>
+          ${c.tasks.map(d => `
+            <div class="ltask" style="--c:${s.color}">
+              <div class="h"><span class="id">${d.id}</span><span class="nm">${d.name}</span>
+                ${d.tags.map(g => `<span class="b">${g}</span>`).join('')}</div>
+              ${d.obj.map(o => `<div class="o">${o}</div>`).join('')}
+              <div class="r">${d.rw.map(r => `<span class="chip ${chipCls(r)}">${r}</span>`).join('')}</div>
+            </div>`).join('')}
+        </div>`).join('')}
+    </section>`;
+  }).join('');
+}
+
+document.getElementById('listFilter').innerHTML =
+  `<button class="cbtn on" data-ls="-1" style="--c:#8fd6ff">全部</button>` +
+  DATA.map((s, i) => `<button class="cbtn" data-ls="${i}" style="--c:${s.color}">${s.code} · ${s.name}</button>`).join('');
+
+document.querySelectorAll('#listFilter .cbtn').forEach(b => {
+  b.onclick = () => {
+    listStage = +b.dataset.ls;
+    document.querySelectorAll('#listFilter .cbtn').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    renderList();
+    document.getElementById('listBody').scrollTop = 0;
+  };
+});
+
+/* ============ Tab 切换 ============ */
+const tabMap = document.getElementById('tabMap'), tabList = document.getElementById('tabList');
+const listView = document.getElementById('listView');
+tabMap.onclick = () => {
+  tabMap.classList.add('on'); tabList.classList.remove('on');
+  listView.classList.remove('on');
+  document.getElementById('main').style.display = 'flex';
+  render();
+};
+tabList.onclick = () => {
+  tabList.classList.add('on'); tabMap.classList.remove('on');
+  document.getElementById('main').style.display = 'none';
+  closePanel();
+  listView.classList.add('on');
+  renderList();
+};
+
+/* ============ 启动 ============ */
+render();
+showOverview();
+closePanel();
+requestAnimationFrame(() => {
+  const hp = new URLSearchParams(location.hash.replace(/^#/, ''));
+  if (hp.has('task')) {
+    const id = hp.get('task');
+    const hit = ALL.find(x => x.id === id);
+    if (hit) {
+      DATA.forEach((_, k) => {
+        const s = byKey['s' + k];
+        s.collapsed = k !== hit._s;
+        s.children.forEach(c => c.collapsed = k !== hit._s);
+      });
+      byKey['s' + hit._s].children[hit._c].collapsed = false;
+      const n = byKey['s' + hit._s + '-c' + hit._c + '-t' + hit._t];
+      state.sel = n.key;
+      render();
+      showTask(n);
+      centerOn(n);
+    } else {
+      overview();
+    }
+  } else if (hp.has('all')) {
+    expandAll();
+  } else if (hp.has('info')) {
+    overview();
+    showOverview();
+  } else if (hp.has('list')) {
+    document.getElementById('tabList').click();
+  } else if (hp.has('stage')) {
+    focusStage(Math.max(0, Math.min(3, +hp.get('stage') || 0)));
+  } else {
+    overview();
+  }
+});
+window.addEventListener('resize', () => { render(); });
+</script>
+</body>
+</html>
